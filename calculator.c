@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-// Function declarations
+
 void clearScreen();
 void basicCalculator();
 void advancedCalculator();
@@ -169,3 +169,4 @@ long long factorial(int n) {
     else
         return n * factorial(n - 1);
 }
+
