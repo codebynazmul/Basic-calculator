@@ -5,7 +5,6 @@
 
 #define MAX_HISTORY 100
 
-
 char history[MAX_HISTORY][100];
 int historyCount = 0;
 
@@ -15,6 +14,11 @@ void addHistory(const char *entry) {
         historyCount++;
     }
 }
+
+void clearScreen();
+void basicCalculator();
+void advancedCalculator();
+long long factorial(int n);
 
 void showHistory() {
     clearScreen();
@@ -31,13 +35,6 @@ void showHistory() {
     printf("===========================\n");
 }
 
-
-void clearScreen();
-void basicCalculator();
-void advancedCalculator();
-long long factorial(int n);
-
-
 int main() {
     int choice;
 
@@ -47,7 +44,7 @@ int main() {
         printf("       SIMPLE CALCULATOR     \n");
         printf("============================\n");
         printf("1. Basic Operations (+, -, *, /)\n");
-        printf("2. Advanced Operations (sqrt, power, factorial)\n");
+        printf("2. Advanced Operations (sqrt, power, factorial, sin, cos, tan)\n");
         printf("3. View History\n");
         printf("4. Exit\n");
         printf("----------------------------\n");
@@ -88,7 +85,6 @@ int main() {
     return 0;
 }
 
-
 void clearScreen() {
     fflush(stdout);
     int ret = 0;
@@ -105,7 +101,6 @@ void clearScreen() {
         fflush(stdout);
     }
 }
-
 
 void basicCalculator() {
     float a, b, result;
@@ -162,7 +157,6 @@ void basicCalculator() {
     }
 }
 
-
 void advancedCalculator() {
     int choice;
     double num, base, exp;
@@ -173,6 +167,9 @@ void advancedCalculator() {
     printf("1. Square Root\n");
     printf("2. Power\n");
     printf("3. Factorial\n");
+    printf("4. Sine (sin)\n");
+    printf("5. Cosine (cos)\n");
+    printf("6. Tangent (tan)\n");
     printf("Enter your choice: ");
 
     if (scanf("%d", &choice) != 1) {
@@ -227,11 +224,37 @@ void advancedCalculator() {
             }
             break;
 
+        case 4:  // sin
+            printf("Enter angle in radians: ");
+            if (scanf("%lf", &num) != 1) { printf("Invalid input.\n"); return; }
+
+            printf("sin(%.2lf) = %.4lf\n", num, sin(num));
+            sprintf(entry, "sin(%.2lf) = %.4lf", num, sin(num));
+            addHistory(entry);
+            break;
+
+        case 5:  // cos
+            printf("Enter angle in radians: ");
+            if (scanf("%lf", &num) != 1) { printf("Invalid input.\n"); return; }
+
+            printf("cos(%.2lf) = %.4lf\n", num, cos(num));
+            sprintf(entry, "cos(%.2lf) = %.4lf", num, cos(num));
+            addHistory(entry);
+            break;
+
+        case 6:  // tan
+            printf("Enter angle in radians: ");
+            if (scanf("%lf", &num) != 1) { printf("Invalid input.\n"); return; }
+
+            printf("tan(%.2lf) = %.4lf\n", num, tan(num));
+            sprintf(entry, "tan(%.2lf) = %.4lf", num, tan(num));
+            addHistory(entry);
+            break;
+
         default:
             printf("Invalid choice!\n");
     }
 }
-
 
 long long factorial(int n) {
     if (n == 0 || n == 1)
