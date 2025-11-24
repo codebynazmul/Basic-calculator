@@ -2,80 +2,28 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
+#include <windows.h>   // For Sleep() & color on Windows
 
 #define MAX_HISTORY 100
 
-// Color codes
-#define BLUE "\033[34m"
-#define RESET "\033[0m"
-
-// ===== HISTORY STORAGE =====
-char history[MAX_HISTORY][100];
+char history[MAX_HISTORY][200];
 int historyCount = 0;
 
-void addHistory(const char *entry) {
-    if (historyCount < MAX_HISTORY) {
-        strcpy(history[historyCount], entry);
-        historyCount++;
-    }
-}
-
-// ===== CROSS PLATFORM DELAY =====
-void delay(int ms) {
-#ifdef _WIN32
-    Sleep(ms);
-#else
-    usleep(ms * 1000);
-#endif
-}
-
-// ===== CLEAR SCREEN =====
-void clearScreen() {
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
-}
-
-// ===== ASCII SPLASH SCREEN WITH BLUE COLOR =====
-void showSplash() {
-    clearScreen();
-
-    const char *banner[] = {
-        "_________        .__               .__          __                ",
-        "\\_   ___ \\_____  |  |   ____  __ __|  | _____ _/  |_  ___________ ",
-        "/    \\  \\/\\__  \\ |  | _/ ___\\|  |  \\  | \\__  \\\\   __\\/  _ \\_  __ \\",
-        "\\     \\____/ __ \\|  |_\\  \\___|  |  /  |__/ __ \\|  | (  <_> )  | \\/",
-        " \\______  (____  /____/\\___  >____/|____(____  /__|  \\____/|__|   ",
-        "        \\/     \\/          \\/                \\/                   "
-    };
-
-    for (int i = 0; i < 6; i++) {
-        printf(BLUE "%s\n" RESET, banner[i]);  // Blue color animated
-        delay(180);
-    }
-
-    printf("\n\n" BLUE "Loading Calculator..." RESET);
-    delay(800);
-}
-
+// ===================== FUNCTION DECLARATIONS =====================
+void clearScreen();
+void typeBlue(const char *text, int delay);
+void showIntro();
+void addHistory(const char *entry);
+void showHistory();
 void basicCalculator();
 void advancedCalculator();
 long long factorial(int n);
-void showHistory();
 
-// ===== MAIN FUNCTION =====
+// ===================== MAIN FUNCTION =====================
 int main() {
     int choice;
 
-    showSplash();   // Show animated startup screen
+    showIntro();   // Show blue ASCII animation at start
 
     do {
         clearScreen();
@@ -83,28 +31,21 @@ int main() {
         printf("       SIMPLE CALCULATOR     \n");
         printf("============================\n");
         printf("1. Basic Operations (+, -, *, /)\n");
-        printf("2. Advanced Operations (sqrt, power, factorial, sin, cos, tan)\n");
+        printf("2. Advanced Operations (Scientific)\n");
         printf("3. View History\n");
         printf("4. Exit\n");
         printf("----------------------------\n");
         printf("Enter your choice: ");
 
         if (scanf("%d", &choice) != 1) {
-            int ch;
-            while ((ch = getchar()) != '\n' && ch != EOF) {}
+            while (getchar() != '\n');
             choice = 0;
         }
 
         switch (choice) {
-            case 1:
-                basicCalculator();
-                break;
-            case 2:
-                advancedCalculator();
-                break;
-            case 3:
-                showHistory();
-                break;
+            case 1: basicCalculator(); break;
+            case 2: advancedCalculator(); break;
+            case 3: showHistory(); break;
             case 4:
                 clearScreen();
                 printf("\n====================================\n");
@@ -124,7 +65,47 @@ int main() {
     return 0;
 }
 
-// ===== SHOW HISTORY =====
+// ====================== CLEAR SCREEN ======================
+void clearScreen() {
+    system("cls");
+}
+
+// ====================== TYPING BLUE TEXT ======================
+void typeBlue(const char *text, int delay) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 1); // BLUE
+
+    for (int i = 0; text[i] != '\0'; i++) {
+        printf("%c", text[i]);
+        fflush(stdout);
+        Sleep(delay);
+    }
+
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7); // RESET
+}
+
+// ====================== ASCII INTRO ======================
+void showIntro() {
+    clearScreen();
+    const char *ascii =
+"  _________        .__               .__          __                \n"
+"  \\_   ___ \\_____  |  |   ____  __ __|  | _____ _/  |_  ___________ \n"
+"  /    \\  \\/\\__  \\ |  | _/ ___\\|  |  \\  | \\__  \\\\   __\\/  _ \\_  __ \\\n"
+"  \\     \\____/ __ \\|  |_\\  \\___|  |  /  |__/ __ \\|  | (  <_> )  | \\/\n"
+"   \\______  (____  /____/\\___  >____/|____(____  /__|  \\____/|__|   \n"
+"          \\/     \\/          \\/                \\/                    \n";
+
+    typeBlue(ascii, 1);
+    Sleep(700);
+}
+
+// ====================== HISTORY ======================
+void addHistory(const char *entry) {
+    if (historyCount < MAX_HISTORY) {
+        strcpy(history[historyCount], entry);
+        historyCount++;
+    }
+}
+
 void showHistory() {
     clearScreen();
     printf("========= HISTORY =========\n");
@@ -137,10 +118,11 @@ void showHistory() {
     for (int i = 0; i < historyCount; i++) {
         printf("%d. %s\n", i + 1, history[i]);
     }
+
     printf("===========================\n");
 }
 
-// ===== BASIC CALCULATOR =====
+// ====================== BASIC CALCULATOR ======================
 void basicCalculator() {
     float a, b, result;
     char op;
@@ -151,12 +133,11 @@ void basicCalculator() {
 
     if (scanf("%f %c %f", &a, &op, &b) != 3) {
         printf("Invalid input.\n");
-        int ch;
-        while ((ch = getchar()) != '\n' && ch != EOF) {}
+        while (getchar() != '\n');
         return;
     }
 
-    char entry[100];
+    char entry[200];
 
     switch (op) {
         case '+':
@@ -165,21 +146,18 @@ void basicCalculator() {
             sprintf(entry, "%.2f + %.2f = %.2f", a, b, result);
             addHistory(entry);
             break;
-
         case '-':
             result = a - b;
             printf("Result: %.2f\n", result);
             sprintf(entry, "%.2f - %.2f = %.2f", a, b, result);
             addHistory(entry);
             break;
-
         case '*':
             result = a * b;
             printf("Result: %.2f\n", result);
             sprintf(entry, "%.2f * %.2f = %.2f", a, b, result);
             addHistory(entry);
             break;
-
         case '/':
             if (b == 0) {
                 printf("Error! Division by zero.\n");
@@ -190,115 +168,115 @@ void basicCalculator() {
                 addHistory(entry);
             }
             break;
-
         default:
             printf("Invalid operator!\n");
     }
 }
 
-// ===== ADVANCED CALCULATOR =====
+// ====================== ADVANCED CALCULATOR ======================
 void advancedCalculator() {
     int choice;
-    double num, base, exp;
-    int n;
 
-    clearScreen();
-    printf("--- Advanced Calculator ---\n");
-    printf("1. Square Root\n");
-    printf("2. Power\n");
-    printf("3. Factorial\n");
-    printf("4. Sine (sin)\n");
-    printf("5. Cosine (cos)\n");
-    printf("6. Tangent (tan)\n");
-    printf("Enter your choice: ");
+    do {
+        clearScreen();
+        printf("--- Advanced Calculator ---\n");
+        printf("1. Square Root\n");
+        printf("2. Power\n");
+        printf("3. Factorial\n");
+        printf("4. Sin(x)\n");
+        printf("5. Cos(x)\n");
+        printf("6. Tan(x)\n");
+        printf("7. Exit to Main Menu\n");
+        printf("Choose: ");
 
-    if (scanf("%d", &choice) != 1) {
-        int ch;
-        while ((ch = getchar()) != '\n' && ch != EOF) {}
-        printf("Invalid input.\n");
-        return;
-    }
+        if (scanf("%d", &choice) != 1) {
+            while (getchar() != '\n');
+            choice = 0;
+        }
 
-    char entry[100];
+        char entry[200];
+        double num, base, exp;
+        int n;
 
-    switch (choice) {
-        case 1:
-            printf("Enter number: ");
-            if (scanf("%lf", &num) != 1) return;
+        switch (choice) {
+            case 1:
+                printf("Enter number: ");
+                scanf("%lf", &num);
+                if (num < 0) printf("Error! Negative number.\n");
+                else {
+                    double res = sqrt(num);
+                    printf("Result: %.2lf\n", res);
+                    sprintf(entry, "sqrt(%.2lf) = %.2lf", num, res);
+                    addHistory(entry);
+                }
+                break;
 
-            if (num < 0) {
-                printf("Error! Negative number.\n");
-            } else {
-                double res = sqrt(num);
-                printf("sqrt(%.2lf) = %.2lf\n", num, res);
-                sprintf(entry, "sqrt(%.2lf) = %.2lf", num, res);
+            case 2:
+                printf("Enter base: ");
+                scanf("%lf", &base);
+                printf("Enter exponent: ");
+                scanf("%lf", &exp);
+                double result;
+                result = pow(base, exp);
+                printf("Result: %.2lf\n", result);
+                sprintf(entry, "%.2lf ^ %.2lf = %.2lf", base, exp, result);
                 addHistory(entry);
-            }
-            break;
+                break;
 
-        case 2:
-            printf("Enter base: ");
-            if (scanf("%lf", &base) != 1) return;
+            case 3:
+                printf("Enter integer: ");
+                scanf("%d", &n);
+                if (n < 0) printf("Error! Negative number.\n");
+                else {
+                    long long fact = factorial(n);
+                    printf("Result: %lld\n", fact);
+                    sprintf(entry, "%d! = %lld", n, fact);
+                    addHistory(entry);
+                }
+                break;
 
-            printf("Enter exponent: ");
-            if (scanf("%lf", &exp) != 1) return;
-
-            double result;
-            result = pow(base, exp);
-            printf("Result: %.2lf\n", result);
-            sprintf(entry, "%.2lf ^ %.2lf = %.2lf", base, exp, result);
-            addHistory(entry);
-            break;
-
-        case 3:
-            printf("Enter integer: ");
-            if (scanf("%d", &n) != 1) return;
-
-            if (n < 0) {
-                printf("Error! Negative factorial.\n");
-            } else {
-                long long fact = factorial(n);
-                printf("%d! = %lld\n", n, fact);
-                sprintf(entry, "%d! = %lld", n, fact);
+            case 4:
+                printf("Enter angle (in degrees): ");
+                scanf("%lf", &num);
+                double s = sin(num * M_PI / 180);
+                printf("sin(%.2lf) = %.4lf\n", num, s);
+                sprintf(entry, "sin(%.2lf°) = %.4lf", num, s);
                 addHistory(entry);
-            }
-            break;
+                break;
 
-        case 4:
-            printf("Enter angle (radians): ");
-            if (scanf("%lf", &num) != 1) return;
+            case 5:
+                printf("Enter angle (in degrees): ");
+                scanf("%lf", &num);
+                double c = cos(num * M_PI / 180);
+                printf("cos(%.2lf) = %.4lf\n", num, c);
+                sprintf(entry, "cos(%.2lf°) = %.4lf", num, c);
+                addHistory(entry);
+                break;
 
-            printf("sin(%.2lf) = %.4lf\n", num, sin(num));
-            sprintf(entry, "sin(%.2lf) = %.4lf", num, sin(num));
-            addHistory(entry);
-            break;
+            case 6:
+                printf("Enter angle (in degrees): ");
+                scanf("%lf", &num);
+                double t = tan(num * M_PI / 180);
+                printf("tan(%.2lf) = %.4lf\n", num, t);
+                sprintf(entry, "tan(%.2lf°) = %.4lf", num, t);
+                addHistory(entry);
+                break;
 
-        case 5:
-            printf("Enter angle (radians): ");
-            if (scanf("%lf", &num) != 1) return;
+            case 7:
+                return; // Exit advanced menu
 
-            printf("cos(%.2lf) = %.4lf\n", num, cos(num));
-            sprintf(entry, "cos(%.2lf) = %.4lf", num, cos(num));
-            addHistory(entry);
-            break;
+            default:
+                printf("Invalid choice!\n");
+        }
 
-        case 6:
-            printf("Enter angle (radians): ");
-            if (scanf("%lf", &num) != 1) return;
+        printf("\nPress Enter...");
+        getchar();
+        getchar();
 
-            printf("tan(%.2lf) = %.4lf\n", num, tan(num));
-            sprintf(entry, "tan(%.2lf) = %.4lf", num, tan(num));
-            addHistory(entry);
-            break;
-
-        default:
-            printf("Invalid choice!\n");
-    }
+    } while (choice != 7);
 }
 
-// ===== FACTORIAL =====
+// ====================== FACTORIAL ======================
 long long factorial(int n) {
-    if (n == 0 || n == 1)
-        return 1;
-    return n * factorial(n - 1);
+    return (n <= 1) ? 1 : n * factorial(n - 1);
 }
