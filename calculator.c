@@ -11,6 +11,10 @@
 
 #define MAX_HISTORY 100
 
+// Color codes
+#define BLUE "\033[34m"
+#define RESET "\033[0m"
+
 // ===== HISTORY STORAGE =====
 char history[MAX_HISTORY][100];
 int historyCount = 0;
@@ -22,7 +26,7 @@ void addHistory(const char *entry) {
     }
 }
 
-// ===== CROSS PLATFORM SLEEP =====
+// ===== CROSS PLATFORM DELAY =====
 void delay(int ms) {
 #ifdef _WIN32
     Sleep(ms);
@@ -33,7 +37,6 @@ void delay(int ms) {
 
 // ===== CLEAR SCREEN =====
 void clearScreen() {
-    fflush(stdout);
 #ifdef _WIN32
     system("cls");
 #else
@@ -41,9 +44,10 @@ void clearScreen() {
 #endif
 }
 
-// ===== ASCII SPLASH SCREEN =====
+// ===== ASCII SPLASH SCREEN WITH BLUE COLOR =====
 void showSplash() {
     clearScreen();
+
     const char *banner[] = {
         "_________        .__               .__          __                ",
         "\\_   ___ \\_____  |  |   ____  __ __|  | _____ _/  |_  ___________ ",
@@ -54,15 +58,14 @@ void showSplash() {
     };
 
     for (int i = 0; i < 6; i++) {
-        printf("%s\n", banner[i]);
-        delay(180);  // animation delay
+        printf(BLUE "%s\n" RESET, banner[i]);  // Blue color animated
+        delay(180);
     }
 
-    printf("\n\nLoading Calculator...");
+    printf("\n\n" BLUE "Loading Calculator..." RESET);
     delay(800);
 }
 
-// ===== FUNCTION DECLARATIONS =====
 void basicCalculator();
 void advancedCalculator();
 long long factorial(int n);
@@ -72,8 +75,7 @@ void showHistory();
 int main() {
     int choice;
 
-    showSplash(); // show ASCII animation first
-    delay(600);
+    showSplash();   // Show animated startup screen
 
     do {
         clearScreen();
@@ -222,7 +224,7 @@ void advancedCalculator() {
     switch (choice) {
         case 1:
             printf("Enter number: ");
-            if (scanf("%lf", &num) != 1) { printf("Invalid input.\n"); return; }
+            if (scanf("%lf", &num) != 1) return;
 
             if (num < 0) {
                 printf("Error! Negative number.\n");
@@ -236,10 +238,10 @@ void advancedCalculator() {
 
         case 2:
             printf("Enter base: ");
-            if (scanf("%lf", &base) != 1) { printf("Invalid input.\n"); return; }
+            if (scanf("%lf", &base) != 1) return;
 
             printf("Enter exponent: ");
-            if (scanf("%lf", &exp) != 1) { printf("Invalid input.\n"); return; }
+            if (scanf("%lf", &exp) != 1) return;
 
             double result;
             result = pow(base, exp);
@@ -250,7 +252,7 @@ void advancedCalculator() {
 
         case 3:
             printf("Enter integer: ");
-            if (scanf("%d", &n) != 1) { printf("Invalid input.\n"); return; }
+            if (scanf("%d", &n) != 1) return;
 
             if (n < 0) {
                 printf("Error! Negative factorial.\n");
@@ -264,7 +266,7 @@ void advancedCalculator() {
 
         case 4:
             printf("Enter angle (radians): ");
-            if (scanf("%lf", &num) != 1) { printf("Invalid input.\n"); return; }
+            if (scanf("%lf", &num) != 1) return;
 
             printf("sin(%.2lf) = %.4lf\n", num, sin(num));
             sprintf(entry, "sin(%.2lf) = %.4lf", num, sin(num));
@@ -273,7 +275,7 @@ void advancedCalculator() {
 
         case 5:
             printf("Enter angle (radians): ");
-            if (scanf("%lf", &num) != 1) { printf("Invalid input.\n"); return; }
+            if (scanf("%lf", &num) != 1) return;
 
             printf("cos(%.2lf) = %.4lf\n", num, cos(num));
             sprintf(entry, "cos(%.2lf) = %.4lf", num, cos(num));
@@ -282,7 +284,7 @@ void advancedCalculator() {
 
         case 6:
             printf("Enter angle (radians): ");
-            if (scanf("%lf", &num) != 1) { printf("Invalid input.\n"); return; }
+            if (scanf("%lf", &num) != 1) return;
 
             printf("tan(%.2lf) = %.4lf\n", num, tan(num));
             sprintf(entry, "tan(%.2lf) = %.4lf", num, tan(num));
